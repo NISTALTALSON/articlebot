@@ -1,0 +1,29 @@
+name: Auto Post Articles
+
+on:
+  schedule:
+    - cron: '30 3 * * *'   # 9:00 AM IST (UTC+5:30 = UTC 3:30)
+    - cron: '30 14 * * *'  # 8:00 PM IST (UTC+5:30 = UTC 14:30)
+  workflow_dispatch:         # allows manual trigger from GitHub UI
+
+jobs:
+  post_article:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run article bot
+        env:
+          DEVTO_API_KEY: ${{ secrets.DEVTO_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: python main.py
