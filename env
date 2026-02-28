@@ -1,3 +1,0 @@
-env:
-  DEVTO_API_KEY: ${{ secrets.DEVTO_API_KEY }}
-  GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
