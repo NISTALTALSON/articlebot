@@ -1,13 +1,14 @@
 import os
 import random
 import requests
-import google.generativeai as genai
+from google import genai
+from google.genai import types
 from datetime import datetime
 
 DEVTO_API_KEY = os.environ.get("DEVTO_API_KEY")
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 
-genai.configure(api_key=GEMINI_API_KEY)
+client = genai.Client(api_key=GEMINI_API_KEY)
 
 # ── Topics Pool ──────────────────────────────────────────────────────────────
 TOPICS = [
@@ -50,9 +51,7 @@ TOPICS = [
 
 # ── Article Generator ────────────────────────────────────────────────────────
 def generate_article(title, tags):
-    model = genai.GenerativeModel(
-        model_name="gemini-1.5-flash",
-        system_instruction="""You are a senior cybersecurity professional and tech writer with 10+ years of hands-on experience.
+    system = """You are a senior cybersecurity professional and tech writer with 10+ years of hands-on experience.
 You write articles for Dev.to and Medium that get thousands of reads.
 
 Your writing style — follow these strictly:
@@ -78,7 +77,6 @@ Format:
 - ``` code blocks for all commands and code
 - 900-1300 words total
 - End naturally with a real takeaway — not a forced conclusion paragraph"""
-    )
 
     prompt = f"""Write a Dev.to/Medium article titled: "{title}"
 
@@ -88,7 +86,11 @@ Make it genuinely useful — real insights a reader couldn't just Google in 5 se
 Someone should finish reading this and feel like they actually learned something.
 Write the full article now in Markdown."""
 
-    response = model.generate_content(prompt)
+    response = client.models.generate_content(
+        model="gemini-2.0-flash",
+        config=types.GenerateContentConfig(system_instruction=system),
+        contents=prompt
+    )
     return response.text
 
 
